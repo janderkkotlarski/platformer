@@ -4,9 +4,6 @@ import pygame
 
 pygame.init()
 
-def gravitation(y_pos, y_vel, grav):
-
-
 
 size = width, height = 800, 600
 speed = [0, 0]
@@ -30,15 +27,15 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
 
+    gravitation(player_rect.bottom, speed[1], gravity, height)
+
     speed[1] = speed[1] + mix * gravity
 
     if player_rect.bottom >= height:
         speed[1] = -speed[1]
 
         if player_rect.bottom > height:
-            player_rect.bottom = height
-
-    speed[1] = speed[1] + (1 - mix) * gravity
+           player_rect.bottom = height
 
     player_rect = player_rect.move(speed)
 

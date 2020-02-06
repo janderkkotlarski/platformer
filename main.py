@@ -4,6 +4,10 @@ import pygame
 
 pygame.init()
 
+def gravitation(y_pos, y_vel, grav):
+
+
+
 size = width, height = 800, 600
 speed = [0, 0]
 black = 0, 0, 0
@@ -18,16 +22,25 @@ speed[1] = 1
 player_rect.top = 0
 player_rect.left = 0
 
+gravity = 0.05
+
+mix = 0.45
+
 while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
 
-    player_rect = player_rect.move(speed)
+    speed[1] = speed[1] + mix * gravity
 
-    if (player_rect.bottom >= height) or (player_rect.top <= 0):
+    if player_rect.bottom >= height:
         speed[1] = -speed[1]
 
-    speed[1] = speed[1] + 0.01
+        if player_rect.bottom > height:
+            player_rect.bottom = height
+
+    speed[1] = speed[1] + (1 - mix) * gravity
+
+    player_rect = player_rect.move(speed)
 
     screen.fill(black)
     screen.blit(player, player_rect)

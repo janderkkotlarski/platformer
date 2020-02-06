@@ -22,6 +22,7 @@ while 1:
 
     if player_rect.bottom > height:
         speed[1] = -speed[1]
+        player_rect.bottom = height + 1
 
     speed[1] = speed[1] + 1
 

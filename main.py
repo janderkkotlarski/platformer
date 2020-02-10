@@ -1,5 +1,4 @@
 import sys
-from typing import List
 
 import pygame
 
@@ -11,7 +10,7 @@ class Player:
     def __init__(self, right, left, top, bottom, width, height):
         self.window_width = width
         self.window_height = height
-        self.width = left - right
+        self.width = right - left
         self.height = bottom - top
         self.position_x = self.window_width/2
         self.position_y = self.window_height - self.height/2
@@ -41,11 +40,11 @@ class Player:
         self.position_x += self.speed_x
 
     def move_right(self):
-        self.speed_x = self.move_speed_x;
+        self.speed_x = self.move_speed_x
         self.dragging = True
 
     def move_left(self):
-        self.speed_x = -self.move_speed_x;
+        self.speed_x = -self.move_speed_x
         self.dragging = True
 
     def move_drag(self):
@@ -82,6 +81,8 @@ player_sprite = pygame.image.load("player.png")
 player_rect = player_sprite.get_rect()
 
 player = Player(player_rect.right, player_rect.left, player_rect.top, player_rect.bottom, width, height)
+
+print(player.width)
 
 while 1:
     for event in pygame.event.get():

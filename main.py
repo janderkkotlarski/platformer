@@ -14,7 +14,7 @@ class Block:
         self.width = self.rect.right - self.rect.left
         self.height = self.rect.bottom - self.rect.top
         self.position_x = self.window_width / 2
-        self.position_y = self.window_height - self.height / 2
+        self.position_y = self.window_height / 2
 
     def positioning(self):
         self.rect.centerx = int(self.position_x)
@@ -79,14 +79,13 @@ class Player:
     def fall(self):
         self.speed_y += self.gravity
         self.position_y += self.speed_y
+
+    def land(self):
         if self.position_y >= self.window_height - self.height / 2:
             self.speed_y = 0
             self.position_y = self.window_height - self.height / 2
             if not  pygame.key.get_pressed()[pygame.K_UP]:
                 self.jumped = False
-
-    def move_stop(self):
-        self.speed_x = 0
 
     def dragging(self):
         self.speed_x *= self.drag
@@ -101,12 +100,15 @@ class Player:
             self.position_x = self.window_width - self.width/2
             self.speed_x = 0
 
+    def collide_down(self, block):
+
+
     def positioning(self):
         self.rect.centerx = int(self.position_x)
         self.rect.centery = int(self.position_y)
 
 
-pygame.key.set_repeat(1, 1)
+#  pygame.key.set_repeat(1, 1)
 
 size = width, height = 800, 600
 speed = [0, 0]
@@ -114,15 +116,8 @@ black = 0, 0, 0
 
 screen = pygame.display.set_mode(size)
 
-block_image = pygame.image.load("block.png")
-
-block_images_1 = pygame.transform.smoothscale(block_image, (32, 32))
-
-block_rect = block_images_1.get_rect()
-
+block = Block(width, height)
 player = Player(width, height)
-
-print(player.width)
 
 while 1:
     for event in pygame.event.get():
@@ -135,6 +130,7 @@ while 1:
 
     player.fall()
     player.dragging()
+    player.land()
 
     player.keyboard()
 
@@ -144,7 +140,11 @@ while 1:
     player.boundary()
     player.positioning()
 
+    block.positioning()
+
     screen.fill(black)
-    screen.blit(block_images_1, block_rect)
+
     screen.blit(player.image, player.rect)
+    screen.blit(block.image, block.rect)
+
     pygame.display.flip()

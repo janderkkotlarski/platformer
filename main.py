@@ -10,17 +10,19 @@ class Player:
     def __init__(self, right, left, top, bottom, width, height):
         self.window_width = width
         self.window_height = height
-        self.width = right - left
-        self.height = bottom - top
+        self.image = pygame.transform.smoothscale(pygame.image.load("player.png"), (32, 32))
+        self.rect = self.image.get_rect()
+        self.width = self.rect.right - self.rect.left
+        self.height = self.rect.bottom - self.rect.top
         self.position_x = self.window_width/2
         self.position_y = self.window_height - self.height/2
         self.speed_x = 0
         self.speed_y = 0
-        self.move_speed_x = 0.5
-        self.gravity = 0.003
+        self.move_speed_x = 0.3
+        self.gravity = 0.001
         self.drag = 0.996
         self.dragging = False
-        self.jump_speed = -0.4
+        self.jump_speed = -2.0
         self.jumped = True
 
     def fall(self):
@@ -33,7 +35,7 @@ class Player:
 
     def jump(self):
         if not self.jumped:
-            self.speed_y = -2
+            self.speed_y = self.jump_speed
             self.jumped = True
 
     def move(self):
@@ -68,6 +70,10 @@ class Player:
             self.position_x = self.window_width - self.width/2
             self.speed_x = 0
 
+    def positioning(self):
+        self.rect.centerx = int(self.position_x)
+        self.rect.centery = int(self.position_y)
+
 
 pygame.key.set_repeat(1, 1)
 
@@ -77,8 +83,14 @@ black = 0, 0, 0
 
 screen = pygame.display.set_mode(size)
 
-player_sprite = pygame.image.load("player.png")
-player_rect = player_sprite.get_rect()
+block_image = pygame.image.load("block.png")
+
+block_images_1 = pygame.transform.smoothscale(block_image, (32, 32))
+
+block_rect = block_images_1.get_rect()
+
+player_image = pygame.transform.smoothscale(pygame.image.load("player.png"), (32, 32))
+player_rect = player_image.get_rect()
 
 player = Player(player_rect.right, player_rect.left, player_rect.top, player_rect.bottom, width, height)
 
@@ -110,9 +122,9 @@ while 1:
 
     player.boundary()
 
-    player_rect.centerx = int(player.position_x)
-    player_rect.centery = int(player.position_y)
+    player.positioning()
 
     screen.fill(black)
-    screen.blit(player_sprite, player_rect)
+    screen.blit(block_images_1, block_rect)
+    screen.blit(player.image, player.rect)
     pygame.display.flip()

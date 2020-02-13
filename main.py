@@ -35,12 +35,16 @@ class Player:
         self.speed_y = 0
         self.move_speed_x = 0.3
         self.gravity = 0.001
-        self.drag = 0.998
-        self.jump_speed = -1.5
+        self.drag = 0.985
+        self.jump_speed = -1.0
         self.jumped = False
         self.move_right = False
         self.move_left = False
         self.move_jump = False
+        self.passed = 0
+
+    def set_passed(self, passed):
+        self.passed = passed
 
     def keyboard(self):
         self.move_right = False
@@ -69,7 +73,7 @@ class Player:
             if self.move_right:
                 self.speed_x = 0
 
-        self.position_x += self.speed_x
+        self.position_x += self.passed*self.speed_x
 
     def jump(self):
         if self.move_jump:
@@ -77,14 +81,23 @@ class Player:
             self.jumped = True
 
     def fall(self):
-        self.speed_y += self.gravity
-        self.position_y += self.speed_y
+        self.speed_y += self.passed*self.gravity
+        self.position_y += self.passed*self.speed_y
 
     def land(self):
         if self.position_y >= self.window_height - self.height / 2:
             self.speed_y = 0
             self.position_y = self.window_height - self.height / 2
-            if not  pygame.key.get_pressed()[pygame.K_UP]:
+            if not pygame.key.get_pressed()[pygame.K_UP]:
+                self.jumped = False
+
+    def collide(self, block):
+
+        if (self.position_y + self.height / 2 >= block.position_y - block.height / 2) and\
+                (abs(self.position_x - block.position_x) <= (block.width + self.width) / 2):
+            self.speed_y = 0
+            self.position_y = block.position_y - (block.height + self.height) / 2
+            if not pygame.key.get_pressed()[pygame.K_UP]:
                 self.jumped = False
 
     def dragging(self):
@@ -100,8 +113,7 @@ class Player:
             self.position_x = self.window_width - self.width/2
             self.speed_x = 0
 
-    def collide_down(self, block):
-
+    #  def collide_down(self, block):
 
     def positioning(self):
         self.rect.centerx = int(self.position_x)
@@ -119,7 +131,13 @@ screen = pygame.display.set_mode(size)
 block = Block(width, height)
 player = Player(width, height)
 
+clock = pygame.time.Clock()
+
 while 1:
+    passed = clock.tick(100)
+
+    player.set_passed(passed)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
@@ -131,6 +149,7 @@ while 1:
     player.fall()
     player.dragging()
     player.land()
+    player.collide(block)
 
     player.keyboard()
 

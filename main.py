@@ -1,13 +1,28 @@
 import sys
-
+import numpy
 import pygame
 
 pygame.init()
 
+class Block:
+
+    def __init__(self, width, height):
+        self.window_width = width
+        self.window_height = height
+        self.image = pygame.transform.smoothscale(pygame.image.load("block.png"), (32, 32))
+        self.rect = self.image.get_rect()
+        self.width = self.rect.right - self.rect.left
+        self.height = self.rect.bottom - self.rect.top
+        self.position_x = self.window_width / 2
+        self.position_y = self.window_height - self.height / 2
+
+    def positioning(self):
+        self.rect.centerx = int(self.position_x)
+        self.rect.centery = int(self.position_y)
 
 class Player:
 
-    def __init__(self, right, left, top, bottom, width, height):
+    def __init__(self, width, height):
         self.window_width = width
         self.window_height = height
         self.image = pygame.transform.smoothscale(pygame.image.load("player.png"), (32, 32))
@@ -20,45 +35,61 @@ class Player:
         self.speed_y = 0
         self.move_speed_x = 0.3
         self.gravity = 0.001
-        self.drag = 0.996
-        self.dragging = False
-        self.jump_speed = -2.0
-        self.jumped = True
+        self.drag = 0.998
+        self.jump_speed = -1.5
+        self.jumped = False
+        self.move_right = False
+        self.move_left = False
+        self.move_jump = False
+
+    def keyboard(self):
+        self.move_right = False
+        self.move_left = False
+        self.move_jump = False
+
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_RIGHT]:
+            self.move_right = True
+
+        if keys[pygame.K_LEFT]:
+            self.move_left = True
+
+        if keys[pygame.K_UP] and not self.jumped:
+            self.move_jump = True
+            self.jumped = True
+
+    def move(self):
+        if self.move_right:
+            self.speed_x = self.move_speed_x
+
+        if self.move_left:
+            self.speed_x = -self.move_speed_x
+
+            if self.move_right:
+                self.speed_x = 0
+
+        self.position_x += self.speed_x
+
+    def jump(self):
+        if self.move_jump:
+            self.speed_y = self.jump_speed
+            self.jumped = True
 
     def fall(self):
         self.speed_y += self.gravity
         self.position_y += self.speed_y
-        if self.position_y >= self.window_height - self.height/2:
+        if self.position_y >= self.window_height - self.height / 2:
             self.speed_y = 0
-            self.position_y = self.window_height - self.height/2
-            self.jumped = False
-
-    def jump(self):
-        if not self.jumped:
-            self.speed_y = self.jump_speed
-            self.jumped = True
-
-    def move(self):
-        self.position_x += self.speed_x
-
-    def move_right(self):
-        self.speed_x = self.move_speed_x
-        self.dragging = True
-
-    def move_left(self):
-        self.speed_x = -self.move_speed_x
-        self.dragging = True
-
-    def move_drag(self):
-        self.dragging = False
+            self.position_y = self.window_height - self.height / 2
+            if not  pygame.key.get_pressed()[pygame.K_UP]:
+                self.jumped = False
 
     def move_stop(self):
         self.speed_x = 0
 
-    def dragging_x(self):
+    def dragging(self):
         self.speed_x *= self.drag
-
-    def dragging_y(self):
         self.speed_y *= self.drag
 
     def boundary(self):
@@ -89,10 +120,7 @@ block_images_1 = pygame.transform.smoothscale(block_image, (32, 32))
 
 block_rect = block_images_1.get_rect()
 
-player_image = pygame.transform.smoothscale(pygame.image.load("player.png"), (32, 32))
-player_rect = player_image.get_rect()
-
-player = Player(player_rect.right, player_rect.left, player_rect.top, player_rect.bottom, width, height)
+player = Player(width, height)
 
 print(player.width)
 
@@ -104,24 +132,16 @@ while 1:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 sys.exit()
-            if event.key == pygame.K_UP:
-                player.jump()
-            if event.key == pygame.K_RIGHT:
-                player.move_right()
-            if event.key == pygame.K_LEFT:
-                player.move_left()
-        else:
-            player.move_drag()
 
     player.fall()
+    player.dragging()
+
+    player.keyboard()
+
     player.move()
-
-    player.dragging_x()
-
-    player.dragging_y()
+    player.jump()
 
     player.boundary()
-
     player.positioning()
 
     screen.fill(black)

@@ -7,15 +7,16 @@ pygame.init()
 
 class Block:
 
-    def __init__(self, width, height):
+    def __init__(self, width, height, loop):
         self.window_width = width
         self.window_height = height
-        self.image = pygame.transform.smoothscale(pygame.image.load("block.png"), (64, 64))
+        self.image = pygame.transform.smoothscale(pygame.image.load("block.png"), (256, 256))
         self.rect = self.image.get_rect()
         self.width = self.rect.right - self.rect.left
         self.height = self.rect.bottom - self.rect.top
         self.position_x = self.window_width / 2
-        self.position_y = 3*self.window_height / 4
+        self.position_y = 152
+        self.loop = loop
 
     def positioning(self):
         self.rect.centerx = int(self.position_x)
@@ -23,7 +24,7 @@ class Block:
 
 class Player:
 
-    def __init__(self, width, height):
+    def __init__(self, width, height, loop):
         self.window_width = width
         self.window_height = height
         self.image = pygame.transform.smoothscale(pygame.image.load("player.png"), (32, 32))
@@ -43,6 +44,7 @@ class Player:
         self.move_left = False
         self.move_jump = False
         self.passed = 0
+        self.loop = loop
 
     def set_passed(self, passed):
         self.passed = passed
@@ -74,16 +76,19 @@ class Player:
             if self.move_right:
                 self.speed_x = 0
 
-        self.position_x += self.passed*self.speed_x
+        self.position_x += self.passed*self.speed_x/self.loop
 
     def jump(self):
         if self.move_jump:
-            self.speed_y = self.jump_speed
+            self.speed_y += self.jump_speed
             self.jumped = True
 
     def fall(self):
-        self.speed_y += self.passed*self.gravity
-        self.position_y += self.passed*self.speed_y
+        if self.speed_y > 0:
+            self.jumped = True
+
+        self.speed_y += self.passed*self.gravity/self.loop
+        self.position_y += self.passed*self.speed_y/self.loop
 
     def land(self):
         if self.position_y >= self.window_height - self.height / 2:
@@ -91,40 +96,77 @@ class Player:
             self.position_y = self.window_height - self.height / 2
             if not pygame.key.get_pressed()[pygame.K_UP]:
                 self.jumped = False
+                self.move
 
-    def collide_down(self, block, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus):
+    def collide_against_top(self, block, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus):
 
-        if (self.position_y + self.height / 2 >= block.position_y - block.height / 2) and\
-                (abs(self.position_x - block.position_x) <= (block.width + self.width) / 2) and\
+        if (self.position_y + self.height / 2 >= block.position_y - block.height / 2) and \
+                (self.position_y + self.height / 2 <= block.position_y) and\
                 (delta_x_y_plus <= delta_y_x_plus) and (delta_x_y_plus <= -delta_y_x_minus):
             self.speed_y = 0
             self.position_y = block.position_y - (block.height + self.height) / 2
             if not pygame.key.get_pressed()[pygame.K_UP]:
                 self.jumped = False
 
+    def collide_against_bottom(self, block, delta_x_y_minus, delta_y_x_plus, delta_y_x_minus):
+
+        if (self.position_y - self.height / 2 <= block.position_y + block.height / 2) and \
+                (self.position_y - self.height / 2 >= block.position_y) and \
+                (delta_x_y_minus > delta_y_x_minus) and (delta_x_y_minus > -delta_y_x_plus):
+            self.speed_y = 0
+            self.position_y = block.position_y + (block.height + self.height) / 2
+            self.jumped = True
+
+    def collide_against_right(self, block, delta_x_y_plus, delta_x_y_minus, delta_y_x_minus):
+
+        if (self.position_x - self.width/2 <= block.position_x + block.width/2) and \
+                (self.position_x - self.width / 2 >= block.position_x) and \
+                (delta_x_y_minus <= delta_y_x_minus) and (delta_x_y_plus > -delta_y_x_minus):
+            self.speed_x = 0
+            self.position_x = block.position_x + (block.width + self.width)/2
+            self.jumped = True
+            if (self.speed_y <= 0) and (not pygame.key.get_pressed()[pygame.K_UP]):
+                self.jumped = False
+
+    def collide_against_left(self, block, delta_x_y_plus, delta_x_y_minus, delta_y_x_plus):
+
+        if (self.position_x + self.width/2 >= block.position_x - block.width/2) and \
+                (self.position_x + self.width / 2 <= block.position_x) and \
+                (delta_x_y_plus > delta_y_x_plus) and (delta_x_y_minus <= -delta_y_x_plus):
+            self.speed_x = 0
+            self.position_x = block.position_x - (block.width + self.width)/2
+            self.jumped = True
+            if (self.speed_y <= 0) and (not pygame.key.get_pressed()[pygame.K_UP]):
+                self.jumped = False
+
     def collide(self, block):
 
         delta_x_y_plus = block.width*(self.position_y + self.height / 2 - block.position_y)
+        delta_x_y_minus = delta_x_y_plus - block.width*self.height
         delta_y_x_plus = block.height*(self.position_x + self.width / 2 - block.position_x)
-        delta_y_x_minus = block.height*(self.position_x - self.width / 2 - block.position_x)
+        delta_y_x_minus = delta_y_x_plus - block.height*self.width
 
-        self.collide_down(block, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus)
-
+        self.collide_against_top(block, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus)
+        self.collide_against_bottom(block, delta_x_y_minus, delta_y_x_plus, delta_y_x_minus)
+        self.collide_against_right(block, delta_x_y_plus, delta_x_y_minus, delta_y_x_minus)
+        self.collide_against_left(block, delta_x_y_plus, delta_x_y_minus, delta_y_x_plus)
 
     def dragging(self):
-        self.speed_x *= self.drag
-        self.speed_y *= self.drag
+        self.speed_x *= pow(self.drag, 1.0/self.loop)
+        self.speed_y *= pow(self.drag, 1.0/self.loop)
 
     def boundary(self):
-        if self.position_x < self.width/2:
-            self.position_x = self.width/2
-            self.speed_x = 0
+        if self.position_x < 0:
+            self.position_x += self.window_width
 
-        if self.position_x > self.window_width - self.width/2:
-            self.position_x = self.window_width - self.width/2
-            self.speed_x = 0
+        if self.position_x > self.window_width:
+            self.position_x -= self.window_width
 
-    #  def collide_down(self, block):
+        if self.position_y < 0:
+            self.position_y += self.window_height
+
+        if self.position_y > self.window_height:
+            self.position_y -= self.window_height
 
     def positioning(self):
         self.rect.centerx = int(self.position_x)
@@ -133,14 +175,16 @@ class Player:
 
 #  pygame.key.set_repeat(1, 1)
 
-size = width, height = 800, 600
+size = width, height = 768, 768
 speed = [0, 0]
 black = 0, 0, 0
 
 screen = pygame.display.set_mode(size)
 
-block = Block(width, height)
-player = Player(width, height)
+loop = 100
+
+block = Block(width, height, loop)
+player = Player(width, height, loop)
 
 clock = pygame.time.Clock()
 
@@ -157,17 +201,21 @@ while 1:
             if event.key == pygame.K_ESCAPE:
                 sys.exit()
 
-    player.fall()
-    player.dragging()
-    player.land()
-    player.collide(block)
+    for count in range(loop):
+        player.fall()
+        player.dragging()
+        # player.land()
 
-    player.keyboard()
+        player.keyboard()
 
-    player.move()
-    player.jump()
+        player.move()
 
-    player.boundary()
+        player.collide(block)
+
+        player.jump()
+
+        player.boundary()
+
     player.positioning()
 
     block.positioning()
@@ -175,6 +223,16 @@ while 1:
     screen.fill(black)
 
     screen.blit(player.image, player.rect)
+
+    player_rect = player.rect
+
+    for pos_x in range(-1, 2):
+        for pos_y in range(-1, 2):
+            player_rect = player.rect
+            player_rect.x = player.rect.x + pos_x * width
+            player_rect.y = player.rect.y + pos_y * height
+            screen.blit(player.image, player_rect)
+
     screen.blit(block.image, block.rect)
 
     pygame.display.flip()

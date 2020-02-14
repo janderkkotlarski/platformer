@@ -4,17 +4,18 @@ import pygame
 
 pygame.init()
 
+
 class Block:
 
     def __init__(self, width, height):
         self.window_width = width
         self.window_height = height
-        self.image = pygame.transform.smoothscale(pygame.image.load("block.png"), (32, 32))
+        self.image = pygame.transform.smoothscale(pygame.image.load("block.png"), (64, 64))
         self.rect = self.image.get_rect()
         self.width = self.rect.right - self.rect.left
         self.height = self.rect.bottom - self.rect.top
         self.position_x = self.window_width / 2
-        self.position_y = self.window_height / 2
+        self.position_y = 3*self.window_height / 4
 
     def positioning(self):
         self.rect.centerx = int(self.position_x)
@@ -91,14 +92,24 @@ class Player:
             if not pygame.key.get_pressed()[pygame.K_UP]:
                 self.jumped = False
 
-    def collide(self, block):
+    def collide_down(self, block, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus):
 
         if (self.position_y + self.height / 2 >= block.position_y - block.height / 2) and\
-                (abs(self.position_x - block.position_x) <= (block.width + self.width) / 2):
+                (abs(self.position_x - block.position_x) <= (block.width + self.width) / 2) and\
+                (delta_x_y_plus <= delta_y_x_plus) and (delta_x_y_plus <= -delta_y_x_minus):
             self.speed_y = 0
             self.position_y = block.position_y - (block.height + self.height) / 2
             if not pygame.key.get_pressed()[pygame.K_UP]:
                 self.jumped = False
+
+    def collide(self, block):
+
+        delta_x_y_plus = block.width*(self.position_y + self.height / 2 - block.position_y)
+        delta_y_x_plus = block.height*(self.position_x + self.width / 2 - block.position_x)
+        delta_y_x_minus = block.height*(self.position_x - self.width / 2 - block.position_x)
+
+        self.collide_down(block, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus)
+
 
     def dragging(self):
         self.speed_x *= self.drag

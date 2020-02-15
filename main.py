@@ -229,8 +229,8 @@ while 1:
     for pos_x in range(-1, 2):
         for pos_y in range(-1, 2):
             player_rect = player.rect
-            player_rect.x = player.rect.x + pos_x * width
-            player_rect.y = player.rect.y + pos_y * height
+            player_rect.x += pos_x * width
+            player_rect.y += pos_y * height
             screen.blit(player.image, player_rect)
 
     screen.blit(block.image, block.rect)

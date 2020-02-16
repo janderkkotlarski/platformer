@@ -1,5 +1,6 @@
 import pygame
-
+import random
+import math
 
 class Block:
 
@@ -12,7 +13,12 @@ class Block:
         self.rect = self.image.get_rect()
         self.position_x = pos_x
         self.position_y = pos_y
+        self.passed = 0
         self.loop = loop
+        self.speed_z = 0.02
+        self.theta = random.random() * 2 * math.pi
+        self.speed_x = self.speed_z * math.sin(self.theta)
+        self.speed_y = self.speed_z * math.cos(self.theta)
 
     def positioning(self):
         self.rect.centerx = int(self.position_x)
@@ -39,3 +45,13 @@ class Block:
 
         if self.position_y > self.window_height:
             self.position_y -= self.window_height
+
+    def set_passed(self, passed):
+        self.passed = passed
+
+    def randomove(self):
+        self.position_x += self.passed * self.speed_x / self.loop
+        self.position_y += self.passed * self.speed_y / self.loop
+        self.theta += 0.05*math.pi*(2*random.random() - 1)
+        self.speed_x = self.speed_z * math.sin(self.theta)
+        self.speed_y = self.speed_z * math.cos(self.theta)

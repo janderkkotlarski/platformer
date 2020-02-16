@@ -7,16 +7,20 @@ from block import Block
 
 pygame.init()
 
-size = width, height = 768, 768
-speed = [0, 0]
+window_size = window_width, window_height = 768, 768
 black = 0, 0, 0
 
-screen = pygame.display.set_mode(size)
+screen = pygame.display.set_mode(window_size)
 
 loop = 100
 
-block = Block(width, height, loop)
-player = Player(width, height, loop)
+block_width = 256
+block_height = 256
+block_x = window_width / 2
+block_y = window_height / 2
+
+block = Block(window_width, window_height, loop, block_width, block_height, block_width, block_height)
+player = Player(window_width, window_height, loop)
 
 clock = pygame.time.Clock()
 

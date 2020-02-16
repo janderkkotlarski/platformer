@@ -3,15 +3,15 @@ import pygame
 
 class Block:
 
-    def __init__(self, width, height, loop):
-        self.window_width = width
-        self.window_height = height
-        self.image = pygame.transform.smoothscale(pygame.image.load("block.png"), (512, 512))
+    def __init__(self, window_width, window_height, loop, width, height, pos_x, pos_y):
+        self.window_width = window_width
+        self.window_height = window_height
+        self.width = width
+        self.height = height
+        self.image = pygame.transform.smoothscale(pygame.image.load("block.png"), (width, height))
         self.rect = self.image.get_rect()
-        self.width = self.rect.right - self.rect.left
-        self.height = self.rect.bottom - self.rect.top
-        self.position_x = self.window_width / 2
-        self.position_y = self.window_height - self.height / 2 - 8
+        self.position_x = pos_x
+        self.position_y = pos_y
         self.loop = loop
 
     def positioning(self):
@@ -20,3 +20,9 @@ class Block:
 
     def blit(self, screen):
         screen.blit(self.image, self.rect)
+
+    def resize(self, width, height):
+        self.width = width
+        self.height = height
+        self.image = pygame.transform.smoothscale(pygame.image.load("block.png"), (width, height))
+        self.rect = self.image.get_rect()

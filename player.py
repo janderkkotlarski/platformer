@@ -21,7 +21,7 @@ class Player:
         self.move_speed_x = 0.3
         self.gravity = 0.001
         self.drag = 0.985
-        self.jump_speed = -1.0
+        self.jump_speed = -1.1
         self.jumped = False
         self.move_right = False
         self.move_left = False

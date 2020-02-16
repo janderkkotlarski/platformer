@@ -14,8 +14,8 @@ screen = pygame.display.set_mode(window_size)
 
 loop = 100
 
-block_width = 256
-block_height = 256
+block_width = 32
+block_height = 32
 block_x = window_width / 2
 block_y = window_height / 2
 

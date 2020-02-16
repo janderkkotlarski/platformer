@@ -10,10 +10,8 @@ class Player:
         self.rect = self.image.get_rect()
         self.width = self.rect.right - self.rect.left
         self.height = self.rect.bottom - self.rect.top
-        self.delta_x_plus = 0
-        self.delta_x_minus = 0
-        self.delta_y_plus = 0
-        self.delta_y_minus = 0
+        self.delta_x = 0
+        self.delta_y = 0
         self.position_x = self.window_width/2
         self.position_y = self.window_height - self.height/2
         self.speed_x = 0
@@ -82,73 +80,69 @@ class Player:
                 self.move
 
     def collide_against_top(self, block, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus):
-        if (self.position_y + self.height / 2 + self.delta_y_minus >= block.position_y - block.height / 2) and \
-                (self.position_y + self.height / 2 + self.delta_y_minus <= block.position_y) and\
+        if (self.position_y + self.height / 2 + self.delta_y >= block.position_y - block.height / 2) and \
+                (self.position_y + self.height / 2 + self.delta_y <= block.position_y) and\
                 (delta_x_y_plus <= delta_y_x_plus) and (delta_x_y_plus <= -delta_y_x_minus):
             self.speed_y = 0
-            self.position_y = block.position_y - self.delta_y_minus - (block.height + self.height) / 2
+            self.position_y = block.position_y - self.delta_y - (block.height + self.height) / 2
             if not pygame.key.get_pressed()[pygame.K_UP]:
                 self.jumped = False
 
     def collide_against_bottom(self, block, delta_x_y_minus, delta_y_x_plus, delta_y_x_minus):
 
-        if (self.position_y - self.height / 2 + self.delta_y_plus <= block.position_y + block.height / 2) and \
-                (self.position_y - self.height / 2 + self.delta_y_plus >= block.position_y) and \
+        if (self.position_y - self.height / 2 + self.delta_y <= block.position_y + block.height / 2) and \
+                (self.position_y - self.height / 2 + self.delta_y >= block.position_y) and \
                 (delta_x_y_minus > delta_y_x_minus) and (delta_x_y_minus > -delta_y_x_plus):
             self.speed_y = 0
-            self.position_y = block.position_y - self.delta_y_plus + (block.height + self.height) / 2
+            self.position_y = block.position_y - self.delta_y + (block.height + self.height) / 2
             self.jumped = True
 
     def collide_against_right(self, block, delta_x_y_plus, delta_x_y_minus, delta_y_x_minus):
 
-        if (self.position_x - self.width/2 + self.delta_x_plus <= block.position_x + block.width/2) and \
-                (self.position_x - self.width / 2 + self.delta_x_plus >= block.position_x) and \
+        if (self.position_x - self.width/2 + self.delta_x <= block.position_x + block.width/2) and \
+                (self.position_x - self.width / 2 + self.delta_x >= block.position_x) and \
                 (delta_x_y_minus <= delta_y_x_minus) and (delta_x_y_plus > -delta_y_x_minus):
             self.speed_x = 0
-            self.position_x = block.position_x - self.delta_x_plus + (block.width + self.width)/2
+            self.position_x = block.position_x - self.delta_x + (block.width + self.width)/2
             self.jumped = True
             if (self.speed_y <= 0) and (not pygame.key.get_pressed()[pygame.K_UP]):
                 self.jumped = False
 
     def collide_against_left(self, block, delta_x_y_plus, delta_x_y_minus, delta_y_x_plus):
 
-        if (self.position_x + self.width/2 + self.delta_x_minus >= block.position_x - block.width/2) and \
-                (self.position_x + self.width / 2 + self.delta_x_minus <= block.position_x) and \
+        if (self.position_x + self.width/2 + self.delta_x >= block.position_x - block.width/2) and \
+                (self.position_x + self.width / 2 + self.delta_x <= block.position_x) and \
                 (delta_x_y_plus > delta_y_x_plus) and (delta_x_y_minus <= -delta_y_x_plus):
             self.speed_x = 0
-            self.position_x = block.position_x - self.delta_x_minus - (block.width + self.width)/2
+            self.position_x = block.position_x - self.delta_x - (block.width + self.width)/2
             self.jumped = True
             if (self.speed_y <= 0) and (not pygame.key.get_pressed()[pygame.K_UP]):
                 self.jumped = False
 
     def collide(self, block):
 
-        self.delta_x_minus = 0
-        self.delta_x_plus = 0
-        self.delta_y_minus = 0
-        self.delta_y_plus = 0
+        self.delta_x = 0
+        self.delta_y = 0
 
         if (block.position_x - block.width / 2 <= self.width / 2) and\
                 (self.position_x >= self.window_width - self.width / 2):
-            self.delta_x_minus = -self.window_width
+            self.delta_x += -self.window_width
 
         if (block.position_x + block.width / 2 >= self.window_width - self.width / 2) and\
                 (self.position_x <= self.width / 2):
-            self.delta_x_plus = self.window_width
+            self.delta_x += self.window_width
 
         if (block.position_y - block.height / 2 <= self.height / 2) and \
                 (self.position_y >= self.window_height - self.height / 2):
-            self.delta_y_minus = -self.window_height
+            self.delta_y += -self.window_height
 
         if (block.position_y + block.height / 2 >= self.window_height - self.height / 2) and \
                 (self.position_y <= self.height / 2):
-            self.delta_y_plus = self.window_height
+            self.delta_y += self.window_height
 
-        delta_x_y_plus = block.width*(self.position_y + self.height / 2 - block.position_y)
-        delta_x_y_plus += block.width*(self.delta_y_plus + self.delta_y_minus)
+        delta_x_y_plus = block.width*(self.position_y + self.height / 2 + self.delta_y - block.position_y)
         delta_x_y_minus = delta_x_y_plus - block.width*self.height
-        delta_y_x_plus = block.height*(self.position_x + self.width / 2 - block.position_x)
-        delta_y_x_plus += block.height*(self.delta_x_plus + self.delta_x_minus)
+        delta_y_x_plus = block.height*(self.position_x + self.width / 2 + self.delta_x - block.position_x)
         delta_y_x_minus = delta_y_x_plus - block.height*self.width
 
         self.collide_against_top(block, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus)

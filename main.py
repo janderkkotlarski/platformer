@@ -15,14 +15,14 @@ screen = pygame.display.set_mode(window_size)
 
 loop = 100
 
-block_width = 96
-block_height = 96
+block_width = 128
+block_height = 128
 block_x = window_width / 2
 block_y = window_height / 2
 
 blocks = numpy.array(Block(window_width, window_height, loop, block_width, block_height, random.random()*window_width, random.random()*window_height))
 
-block_number = 20
+block_number = 10
 
 for count in range(1, block_number + 1):
     blocks = numpy.append(blocks, Block(window_width, window_height, loop, block_width, block_height, random.random()*window_width, random.random()*window_height))

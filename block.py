@@ -2,6 +2,7 @@ import pygame
 import random
 import math
 
+
 class Block:
 
     def __init__(self, window_width, window_height, loop, width, height, pos_x, pos_y):
@@ -15,8 +16,9 @@ class Block:
         self.position_y = pos_y
         self.passed = 0
         self.loop = loop
-        self.speed_z = 0.02
+        self.speed_z = 0.025
         self.theta = random.random() * 2 * math.pi
+        self.phi = 0
         self.speed_x = self.speed_z * math.sin(self.theta)
         self.speed_y = self.speed_z * math.cos(self.theta)
 
@@ -52,6 +54,7 @@ class Block:
     def randomove(self):
         self.position_x += self.passed * self.speed_x / self.loop
         self.position_y += self.passed * self.speed_y / self.loop
-        self.theta += 0.05*math.pi*(2*random.random() - 1)
-        self.speed_x = self.speed_z * math.sin(self.theta)
-        self.speed_y = self.speed_z * math.cos(self.theta)
+        self.phi += 0.00005 * math.pi * 2 * random.random()
+        psi = self.theta + 0.5 * math.pi * math.sin(self.phi)
+        self.speed_x = self.speed_z * math.sin(psi)
+        self.speed_y = self.speed_z * math.cos(psi)

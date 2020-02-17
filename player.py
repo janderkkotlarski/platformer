@@ -21,9 +21,12 @@ class Player:
         self.drag = 0.985
         self.jump_speed = -1.1
         self.jumped = False
+        self.glue_field = 0.05
+        self.drop = 0.2
         self.move_right = False
         self.move_left = False
         self.move_jump = False
+        self.move_drop = False
         self.passed = 0
         self.loop = loop
 
@@ -34,6 +37,7 @@ class Player:
         self.move_right = False
         self.move_left = False
         self.move_jump = False
+        self.move_drop = False
 
         keys = pygame.key.get_pressed()
 
@@ -46,6 +50,11 @@ class Player:
         if keys[pygame.K_UP] and not self.jumped:
             self.move_jump = True
             self.jumped = True
+
+        if keys[pygame.K_DOWN]:
+            self.move_drop = True
+            self.move_right = True
+            self.move_left = True
 
     def move(self):
         if self.move_right:
@@ -80,7 +89,7 @@ class Player:
                 self.move
 
     def collide_against_top(self, block, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus):
-        if (self.position_y + self.height / 2 + self.delta_y >= block.position_y - block.height / 2 - 0.01) and \
+        if (self.position_y + self.height / 2 + self.delta_y >= block.position_y - block.height / 2 - self.glue_field) and \
                 (self.position_y + self.height / 2 + self.delta_y <= block.position_y) and\
                 (delta_x_y_plus <= delta_y_x_plus) and (delta_x_y_plus <= -delta_y_x_minus):
             self.speed_y = 0
@@ -90,16 +99,19 @@ class Player:
 
     def collide_against_bottom(self, block, delta_x_y_minus, delta_y_x_plus, delta_y_x_minus):
 
-        if (self.position_y - self.height / 2 + self.delta_y <= block.position_y + block.height / 2 + 0.05) and \
+        if (self.position_y - self.height / 2 + self.delta_y <= block.position_y + block.height / 2 + self.glue_field) and \
                 (self.position_y - self.height / 2 + self.delta_y >= block.position_y) and \
                 (delta_x_y_minus > delta_y_x_minus) and (delta_x_y_minus > -delta_y_x_plus):
             self.speed_y = 0
             self.position_y = block.position_y - self.delta_y + (block.height + self.height) / 2
             self.jumped = True
+            if self.move_drop:
+                self.speed_y = self.move_speed_x
+                self.position_y += self.drop
 
     def collide_against_right(self, block, delta_x_y_plus, delta_x_y_minus, delta_y_x_minus):
 
-        if (self.position_x - self.width/2 + self.delta_x <= block.position_x + block.width/2 + 0.05) and \
+        if (self.position_x - self.width/2 + self.delta_x <= block.position_x + block.width/2 + self.glue_field) and \
                 (self.position_x - self.width / 2 + self.delta_x >= block.position_x) and \
                 (delta_x_y_minus <= delta_y_x_minus) and (delta_x_y_plus > -delta_y_x_minus):
             self.speed_x = 0
@@ -110,7 +122,7 @@ class Player:
 
     def collide_against_left(self, block, delta_x_y_plus, delta_x_y_minus, delta_y_x_plus):
 
-        if (self.position_x + self.width/2 + self.delta_x >= block.position_x - block.width/2 + 0.05) and \
+        if (self.position_x + self.width/2 + self.delta_x >= block.position_x - block.width/2 + self.glue_field) and \
                 (self.position_x + self.width / 2 + self.delta_x <= block.position_x) and \
                 (delta_x_y_plus > delta_y_x_plus) and (delta_x_y_minus <= -delta_y_x_plus):
             self.speed_x = 0

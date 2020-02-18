@@ -3,7 +3,7 @@ import pygame
 
 class Player:
 
-    def __init__(self, window_length, loop, length):
+    def __init__(self, window_length, loop, length, identity):
         self.window_length = window_length
         self.length = length
         self.image = pygame.transform.smoothscale(pygame.image.load("player.png"), (int(length), int(length)))
@@ -26,11 +26,36 @@ class Player:
         self.move_left = False
         self.move_jump = False
         self.move_drop = False
+        self.lose = False
         self.passed = 0
         self.loop = loop
+        self.identity = identity
+        self.key_up = pygame.K_UP
+        self.key_down = pygame.K_DOWN
+        self.key_right = pygame.K_RIGHT
+        self.key_left = pygame.K_LEFT
 
     def set_passed(self, passed):
         self.passed = passed
+
+    def set_keys(self):
+        if self.identity == 1:
+            self.key_up = pygame.K_w
+            self.key_down = pygame.K_s
+            self.key_right = pygame.K_d
+            self.key_left = pygame.K_a
+
+        if self.identity == 2:
+            self.key_up = pygame.K_t
+            self.key_down = pygame.K_g
+            self.key_right = pygame.K_h
+            self.key_left = pygame.K_f
+
+        if self.identity == 3:
+            self.key_up = pygame.K_i
+            self.key_down = pygame.K_k
+            self.key_right = pygame.K_l
+            self.key_left = pygame.K_j
 
     def keyboard(self):
         self.move_right = False
@@ -40,17 +65,17 @@ class Player:
 
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_RIGHT]:
+        if keys[self.key_right]:
             self.move_right = True
 
-        if keys[pygame.K_LEFT]:
+        if keys[self.key_left]:
             self.move_left = True
 
-        if keys[pygame.K_UP] and not self.jumped:
+        if keys[self.key_up] and not self.jumped:
             self.move_jump = True
             self.jumped = True
 
-        if keys[pygame.K_DOWN]:
+        if keys[self.key_down]:
             self.move_drop = True
             self.move_right = True
             self.move_left = True
@@ -79,25 +104,16 @@ class Player:
         self.speed_y += self.passed*self.gravity/self.loop
         self.position_y += self.passed*self.speed_y/self.loop
 
-    def land(self):
-        if self.position_y >= self.window_length - self.length / 2:
-            self.speed_y = 0
-            self.position_y = self.window_length - self.length / 2
-            if not pygame.key.get_pressed()[pygame.K_UP]:
-                self.jumped = False
-                self.move
-
     def collide_against_top(self, block, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus):
         if (self.position_y + self.length / 2 + self.delta_y >= block.position_y - block.length / 2 - self.glue_field) and \
                 (self.position_y + self.length / 2 + self.delta_y <= block.position_y) and\
                 (delta_x_y_plus <= delta_y_x_plus) and (delta_x_y_plus <= -delta_y_x_minus):
             self.speed_y = 0
             self.position_y = block.position_y - self.delta_y - (block.length + self.length) / 2
-            if not pygame.key.get_pressed()[pygame.K_UP]:
+            if not pygame.key.get_pressed()[self.key_up]:
                 self.jumped = False
 
     def collide_against_bottom(self, block, delta_x_y_minus, delta_y_x_plus, delta_y_x_minus):
-
         if (self.position_y - self.length / 2 + self.delta_y <= block.position_y + block.length / 2 + self.glue_field) and \
                 (self.position_y - self.length / 2 + self.delta_y >= block.position_y) and \
                 (delta_x_y_minus > delta_y_x_minus) and (delta_x_y_minus > -delta_y_x_plus):
@@ -109,25 +125,23 @@ class Player:
                 self.position_y += self.drop
 
     def collide_against_right(self, block, delta_x_y_plus, delta_x_y_minus, delta_y_x_minus):
-
         if (self.position_x - self.length/2 + self.delta_x <= block.position_x + block.length/2 + self.glue_field) and \
                 (self.position_x - self.length / 2 + self.delta_x >= block.position_x) and \
                 (delta_x_y_minus <= delta_y_x_minus) and (delta_x_y_plus > -delta_y_x_minus):
             self.speed_x = 0
             self.position_x = block.position_x - self.delta_x + (block.length + self.length)/2
             self.jumped = True
-            if (self.speed_y <= 0) and (not pygame.key.get_pressed()[pygame.K_UP]):
+            if (self.speed_y <= 0) and (not pygame.key.get_pressed()[self.key_up]):
                 self.jumped = False
 
     def collide_against_left(self, block, delta_x_y_plus, delta_x_y_minus, delta_y_x_plus):
-
         if (self.position_x + self.length/2 + self.delta_x >= block.position_x - block.length/2 + self.glue_field) and \
                 (self.position_x + self.length / 2 + self.delta_x <= block.position_x) and \
                 (delta_x_y_plus > delta_y_x_plus) and (delta_x_y_minus <= -delta_y_x_plus):
             self.speed_x = 0
             self.position_x = block.position_x - self.delta_x - (block.length + self.length)/2
             self.jumped = True
-            if (self.speed_y <= 0) and (not pygame.key.get_pressed()[pygame.K_UP]):
+            if (self.speed_y <= 0) and (not pygame.key.get_pressed()[self.key_up]):
                 self.jumped = False
 
     def collide(self, block):
@@ -160,6 +174,86 @@ class Player:
         self.collide_against_bottom(block, delta_x_y_minus, delta_y_x_plus, delta_y_x_minus)
         self.collide_against_right(block, delta_x_y_plus, delta_x_y_minus, delta_y_x_minus)
         self.collide_against_left(block, delta_x_y_plus, delta_x_y_minus, delta_y_x_plus)
+
+    def collide_other_top(self, player, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus):
+        if (self.position_y + self.length / 2 + self.delta_y >= player.position_y - player.length / 2 - self.glue_field) and \
+                (self.position_y + self.length / 2 + self.delta_y <= player.position_y) and\
+                (delta_x_y_plus <= delta_y_x_plus) and (delta_x_y_plus <= -delta_y_x_minus):
+            self.speed_y = 0
+
+            average_y = (self.position_y + player.position_y) / 2
+
+            self.position_y = average_y - self.length / 2
+            player.position_y = average_y + player.length / 2
+
+            player.lose = True
+
+    def collide_other_bottom(self, player, delta_x_y_minus, delta_y_x_plus, delta_y_x_minus):
+        if (self.position_y - self.length / 2 + self.delta_y <= player.position_y + player.length / 2 + self.glue_field) and \
+                (self.position_y - self.length / 2 + self.delta_y >= player.position_y) and \
+                (delta_x_y_minus > delta_y_x_minus) and (delta_x_y_minus > -delta_y_x_plus):
+            self.speed_y = 0
+
+            average_y = (self.position_y + player.position_y) / 2
+
+            self.position_y = average_y + self.length / 2
+            player.position_y = average_y - player.length / 2
+
+            self.lose = True
+
+    def collide_other_right(self, player, delta_x_y_plus, delta_x_y_minus, delta_y_x_minus):
+        if (self.position_x - self.length/2 + self.delta_x <= player.position_x + player.length / 2 + self.glue_field) and \
+                (self.position_x - self.length / 2 + self.delta_x >= player.position_x) and \
+                (delta_x_y_minus <= delta_y_x_minus) and (delta_x_y_plus > -delta_y_x_minus):
+            self.speed_x = 0
+            player.speed_x = 0
+
+            average_x = (self.position_x + player.position_x) / 2
+
+            self.position_x = average_x + self.length / 2
+            player.position_x = average_x - player.length / 2
+
+    def collide_other_left(self, player, delta_x_y_plus, delta_x_y_minus, delta_y_x_plus):
+        if (self.position_x + self.length/2 + self.delta_x >= player.position_x - player.length/2 + self.glue_field) and \
+                (self.position_x + self.length / 2 + self.delta_x <= player.position_x) and \
+                (delta_x_y_plus > delta_y_x_plus) and (delta_x_y_minus <= -delta_y_x_plus):
+            self.speed_x = 0
+            player.speed_x = 0
+
+            average_x = (self.position_x + player.position_x) / 2
+
+            self.position_x = average_x - self.length / 2
+            player.position_x = average_x + player.length / 2
+
+    def collide_other(self, player):
+        self.delta_x = 0
+        self.delta_y = 0
+
+        if (player.position_x - player.length / 2 <= self.length / 2) and \
+                (self.position_x >= self.window_length - self.length / 2):
+            self.delta_x += -self.window_length
+
+        if (player.position_x + player.length / 2 >= self.window_length - self.length / 2) and \
+                (self.position_x <= self.length / 2):
+            self.delta_x += self.window_length
+
+        if (player.position_y - player.length / 2 <= self.length / 2) and \
+                (self.position_y >= self.window_length - self.length / 2):
+            self.delta_y += -self.window_length
+
+        if (player.position_y + player.length / 2 >= self.window_length - self.length / 2) and \
+                (self.position_y <= self.length / 2):
+            self.delta_y += self.window_length
+
+        delta_x_y_plus = player.length * (self.position_y + self.length / 2 + self.delta_y - player.position_y)
+        delta_x_y_minus = delta_x_y_plus - player.length * self.length
+        delta_y_x_plus = player.length * (self.position_x + self.length / 2 + self.delta_x - player.position_x)
+        delta_y_x_minus = delta_y_x_plus - player.length * self.length
+
+        self.collide_other_top(player, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus)
+        self.collide_other_bottom(player, delta_x_y_minus, delta_y_x_plus, delta_y_x_minus)
+        self.collide_other_right(player, delta_x_y_plus, delta_x_y_minus, delta_y_x_minus)
+        self.collide_other_left(player, delta_x_y_plus, delta_x_y_minus, delta_y_x_plus)
 
     def dragging(self):
         self.speed_x *= pow(self.drag, 1.0/self.loop)

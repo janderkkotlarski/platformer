@@ -26,7 +26,8 @@ block_number = 10
 for count in range(1, block_number + 1):
     blocks = numpy.append(blocks, numpy.array(Block(window_length, loop, 2*grid_length, window_length*random.random(), window_length*random.random())))
 
-player = Player(window_length, loop, grid_length)
+player = Player(window_length, loop, grid_length, 3)
+player.set_keys()
 
 clock = pygame.time.Clock()
 

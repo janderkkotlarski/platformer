@@ -133,7 +133,7 @@ class Player:
                 (self.position_y + self.radius + self.delta_y <= block.position_y) and\
                 (delta_x_y_plus <= delta_y_x_plus) and (delta_x_y_plus <= -delta_y_x_minus):
             self.speed_y = 0
-            self.position_y = block.position_y - self.delta_y - block.radius + self.radius
+            self.position_y = block.position_y - self.delta_y - block.radius - self.radius
             if not pygame.key.get_pressed()[self.key_up]:
                 self.jumped = False
 
@@ -163,7 +163,7 @@ class Player:
                 (self.position_x + self.radius + self.delta_x <= block.position_x) and \
                 (delta_x_y_plus > delta_y_x_plus) and (delta_x_y_minus <= -delta_y_x_plus):
             self.speed_x = 0
-            self.position_x = block.position_x - self.delta_x - block.radius + self.radius
+            self.position_x = block.position_x - self.delta_x - block.radius - self.radius
             self.jumped = True
             if (self.speed_y <= 0) and (not pygame.key.get_pressed()[self.key_up]):
                 self.jumped = False
@@ -190,8 +190,8 @@ class Player:
                     (self.position_y <= self.radius):
                 self.delta_y += self.window_length
 
-            self.delta_x = 0
-            self.delta_y = 0
+            # self.delta_x = 0
+            # self.delta_y = 0
 
             delta_x_y_plus = block.length*(self.position_y + self.radius + self.delta_y - block.position_y)
             delta_x_y_minus = delta_x_y_plus - block.length*self.length

@@ -21,14 +21,21 @@ while 1:
 
     grid_length = window_length / 20
 
-    player_number = 4
+    player_number = 2
 
-    blocks = numpy.array(Block(window_length, loop, 2*grid_length, grid_length, grid_length))
+    blocks = numpy.array(Block(window_length, loop, 2 * grid_length, 2 * grid_length, 2.25 * grid_length))
+
+    blocks = numpy.append(blocks, numpy.array(
+        Block(window_length, loop, 2 * grid_length, window_length - 0.75 * grid_length, 1.25 * grid_length)))
+    blocks = numpy.append(blocks, numpy.array(
+        Block(window_length, loop, 2 * grid_length, 2 * grid_length, window_length - 1.25 * grid_length)))
+    blocks = numpy.append(blocks, numpy.array(
+        Block(window_length, loop, 2 * grid_length, window_length - 0.75 * grid_length, window_length - 1.75 * grid_length)))
 
     block_number = 10
 
-    for count in range(1, block_number + 1):
-        blocks = numpy.append(blocks, numpy.array(Block(window_length, loop, 2*grid_length, window_length*random.random(), window_length*random.random())))
+    # for count in range(1, block_number + 1):
+    #     blocks = numpy.append(blocks, numpy.array(Block(window_length, loop, 2*grid_length, window_length*random.random(), window_length*random.random())))
 
     players = numpy.array(Player(window_length, loop, grid_length, window_length*random.random(), window_length*random.random(), 0))
 

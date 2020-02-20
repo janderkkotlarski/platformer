@@ -6,6 +6,7 @@ class Player:
     def __init__(self, window_length, loop, length, pos_x, pos_y, identity):
         self.window_length = window_length
         self.length = length
+        self.radius = length / 2
         self.image = pygame.transform.smoothscale(pygame.image.load("player.png"), (int(length), int(length)))
         self.rect = self.image.get_rect()
         self.delta_x = 0
@@ -128,41 +129,41 @@ class Player:
             self.position_y += self.passed*self.speed_y/self.loop
 
     def collide_against_top(self, block, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus):
-        if (self.position_y + self.length / 2 + self.delta_y >= block.position_y - block.length / 2 - self.glue_field) and \
-                (self.position_y + self.length / 2 + self.delta_y <= block.position_y) and\
+        if (self.position_y + self.radius + self.delta_y >= block.position_y - block.radius - self.glue_field) and \
+                (self.position_y + self.radius + self.delta_y <= block.position_y) and\
                 (delta_x_y_plus <= delta_y_x_plus) and (delta_x_y_plus <= -delta_y_x_minus):
             self.speed_y = 0
-            self.position_y = block.position_y - self.delta_y - (block.length + self.length) / 2
+            self.position_y = block.position_y - self.delta_y - block.radius + self.radius
             if not pygame.key.get_pressed()[self.key_up]:
                 self.jumped = False
 
     def collide_against_bottom(self, block, delta_x_y_minus, delta_y_x_plus, delta_y_x_minus):
-        if (self.position_y - self.length / 2 + self.delta_y <= block.position_y + block.length / 2 + self.glue_field) and \
-                (self.position_y - self.length / 2 + self.delta_y >= block.position_y) and \
+        if (self.position_y - self.radius + self.delta_y <= block.position_y + block.radius + self.glue_field) and \
+                (self.position_y - self.radius + self.delta_y >= block.position_y) and \
                 (delta_x_y_minus > delta_y_x_minus) and (delta_x_y_minus > -delta_y_x_plus):
             self.speed_y = 0
-            self.position_y = block.position_y - self.delta_y + (block.length + self.length) / 2
+            self.position_y = block.position_y - self.delta_y + block.radius + self.radius
             self.jumped = True
             if self.move_drop:
                 self.speed_y = self.move_speed_x
                 self.position_y += self.drop
 
     def collide_against_right(self, block, delta_x_y_plus, delta_x_y_minus, delta_y_x_minus):
-        if (self.position_x - self.length/2 + self.delta_x <= block.position_x + block.length/2 + self.glue_field) and \
-                (self.position_x - self.length / 2 + self.delta_x >= block.position_x) and \
+        if (self.position_x - self.radius + self.delta_x <= block.position_x + block.radius + self.glue_field) and \
+                (self.position_x - self.radius + self.delta_x >= block.position_x) and \
                 (delta_x_y_minus <= delta_y_x_minus) and (delta_x_y_plus > -delta_y_x_minus):
             self.speed_x = 0
-            self.position_x = block.position_x - self.delta_x + (block.length + self.length)/2
+            self.position_x = block.position_x - self.delta_x + block.radius + self.radius
             self.jumped = True
             if (self.speed_y <= 0) and (not pygame.key.get_pressed()[self.key_up]):
                 self.jumped = False
 
     def collide_against_left(self, block, delta_x_y_plus, delta_x_y_minus, delta_y_x_plus):
-        if (self.position_x + self.length/2 + self.delta_x >= block.position_x - block.length/2 + self.glue_field) and \
-                (self.position_x + self.length / 2 + self.delta_x <= block.position_x) and \
+        if (self.position_x + self.radius + self.delta_x >= block.position_x - block.radius + self.glue_field) and \
+                (self.position_x + self.radius + self.delta_x <= block.position_x) and \
                 (delta_x_y_plus > delta_y_x_plus) and (delta_x_y_minus <= -delta_y_x_plus):
             self.speed_x = 0
-            self.position_x = block.position_x - self.delta_x - (block.length + self.length)/2
+            self.position_x = block.position_x - self.delta_x - block.radius + self.radius
             self.jumped = True
             if (self.speed_y <= 0) and (not pygame.key.get_pressed()[self.key_up]):
                 self.jumped = False
@@ -172,25 +173,29 @@ class Player:
             self.delta_x = 0
             self.delta_y = 0
 
-            if (block.position_x - block.length / 2 <= self.length / 2) and\
-                    (self.position_x >= self.window_length - self.length / 2):
+            # Collide against left of block
+            if (block.position_x - block.radius <= self.position_x + self.radius - self.window_length) and\
+                    (self.position_x >= self.window_length - self.radius):
                 self.delta_x += -self.window_length
 
-            if (block.position_x + block.length / 2 >= self.window_length - self.length / 2) and\
-                    (self.position_x <= self.length / 2):
+            if (block.position_x + block.radius >= self.position_x - self.radius + self.window_length) and\
+                    (self.position_x <= self.radius):
                 self.delta_x += self.window_length
 
-            if (block.position_y - block.length / 2 <= self.length / 2) and \
-                    (self.position_y >= self.window_length - self.length / 2):
+            if (block.position_y - block.radius <= self.position_y + self.radius - self.window_length) and \
+                    (self.position_y >= self.window_length - self.radius):
                 self.delta_y += -self.window_length
 
-            if (block.position_y + block.length / 2 >= self.window_length - self.length / 2) and \
-                    (self.position_y <= self.length / 2):
+            if (block.position_y + block.radius >= self.position_y - self.radius + self.window_length) and \
+                    (self.position_y <= self.radius):
                 self.delta_y += self.window_length
 
-            delta_x_y_plus = block.length*(self.position_y + self.length / 2 + self.delta_y - block.position_y)
+            self.delta_x = 0
+            self.delta_y = 0
+
+            delta_x_y_plus = block.length*(self.position_y + self.radius + self.delta_y - block.position_y)
             delta_x_y_minus = delta_x_y_plus - block.length*self.length
-            delta_y_x_plus = block.length*(self.position_x + self.length / 2 + self.delta_x - block.position_x)
+            delta_y_x_plus = block.length*(self.position_x + self.radius + self.delta_x - block.position_x)
             delta_y_x_minus = delta_y_x_plus - block.length*self.length
 
             self.collide_against_top(block, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus)
@@ -199,79 +204,79 @@ class Player:
             self.collide_against_left(block, delta_x_y_plus, delta_x_y_minus, delta_y_x_plus)
 
     def collide_other_top(self, player, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus):
-        if (self.position_y + self.length / 2 + self.delta_y >= player.position_y - player.length / 2 - self.glue_field) and \
-                (self.position_y + self.length / 2 + self.delta_y <= player.position_y) and\
+        if (self.position_y + self.radius + self.delta_y >= player.position_y - player.radius - self.glue_field) and \
+                (self.position_y + self.radius + self.delta_y <= player.position_y) and\
                 (delta_x_y_plus <= delta_y_x_plus) and (delta_x_y_plus <= -delta_y_x_minus):
             self.speed_y = 0
 
             average_y = (self.position_y + player.position_y) / 2
 
-            self.position_y = average_y - self.length / 2
-            player.position_y = average_y + player.length / 2
+            self.position_y = average_y - self.radius
+            player.position_y = average_y + player.radius
 
             player.alive = False
 
     def collide_other_bottom(self, player, delta_x_y_minus, delta_y_x_plus, delta_y_x_minus):
-        if (self.position_y - self.length / 2 + self.delta_y <= player.position_y + player.length / 2 + self.glue_field) and \
-                (self.position_y - self.length / 2 + self.delta_y >= player.position_y) and \
+        if (self.position_y - self.radius + self.delta_y <= player.position_y + player.radius + self.glue_field) and \
+                (self.position_y - self.radius + self.delta_y >= player.position_y) and \
                 (delta_x_y_minus > delta_y_x_minus) and (delta_x_y_minus > -delta_y_x_plus):
             self.speed_y = 0
 
             average_y = (self.position_y + player.position_y) / 2
 
-            self.position_y = average_y + self.length / 2
-            player.position_y = average_y - player.length / 2
+            self.position_y = average_y + self.radius
+            player.position_y = average_y - player.radius
 
             self.alive = False
 
     def collide_other_right(self, player, delta_x_y_plus, delta_x_y_minus, delta_y_x_minus):
-        if (self.position_x - self.length/2 + self.delta_x <= player.position_x + player.length / 2 + self.glue_field) and \
-                (self.position_x - self.length / 2 + self.delta_x >= player.position_x) and \
+        if (self.position_x - self.radius + self.delta_x <= player.position_x + player.radius + self.glue_field) and \
+                (self.position_x - self.radius + self.delta_x >= player.position_x) and \
                 (delta_x_y_minus <= delta_y_x_minus) and (delta_x_y_plus > -delta_y_x_minus):
             self.speed_x = 0
             player.speed_x = 0
 
             average_x = (self.position_x + player.position_x) / 2
 
-            self.position_x = average_x + self.length / 2
-            player.position_x = average_x - player.length / 2
+            self.position_x = average_x + self.radius
+            player.position_x = average_x - player.radius
 
     def collide_other_left(self, player, delta_x_y_plus, delta_x_y_minus, delta_y_x_plus):
-        if (self.position_x + self.length/2 + self.delta_x >= player.position_x - player.length/2 + self.glue_field) and \
-                (self.position_x + self.length / 2 + self.delta_x <= player.position_x) and \
+        if (self.position_x + self.radius + self.delta_x >= player.position_x - player.radius + self.glue_field) and \
+                (self.position_x + self.radius + self.delta_x <= player.position_x) and \
                 (delta_x_y_plus > delta_y_x_plus) and (delta_x_y_minus <= -delta_y_x_plus):
             self.speed_x = 0
             player.speed_x = 0
 
             average_x = (self.position_x + player.position_x) / 2
 
-            self.position_x = average_x - self.length / 2
-            player.position_x = average_x + player.length / 2
+            self.position_x = average_x - self.radius
+            player.position_x = average_x + player.radius
 
     def collide_other(self, player):
         if self.alive and player.alive:
             self.delta_x = 0
             self.delta_y = 0
 
-            if (player.position_x - player.length / 2 <= self.length / 2) and \
-                    (self.position_x >= self.window_length - self.length / 2):
+            if (player.position_x - player.radius <= self.radius) and \
+                    (self.position_x >= self.window_length - self.radius):
                 self.delta_x += -self.window_length
 
-            if (player.position_x + player.length / 2 >= self.window_length - self.length / 2) and \
-                    (self.position_x <= self.length / 2):
+            if (player.position_x + player.radius >= self.window_length - self.radius) and \
+                    (self.position_x <= self.radius):
                 self.delta_x += self.window_length
 
-            if (player.position_y - player.length / 2 <= self.length / 2) and \
-                    (self.position_y >= self.window_length - self.length / 2):
+            if (player.position_y - player.radius <= self.radius) and \
+                    (self.position_y >= self.window_length - self.radius):
                 self.delta_y += -self.window_length
 
-            if (player.position_y + player.length / 2 >= self.window_length - self.length / 2) and \
-                    (self.position_y <= self.length / 2):
+            if (player.position_y + player.radius >= self.window_length - self.radius) and \
+                    (self.position_y <= self.radius):
                 self.delta_y += self.window_length
 
-            delta_x_y_plus = player.length * (self.position_y + self.length / 2 + self.delta_y - player.position_y)
+            delta_x_y_plus = player.length * (self.position_y + self.radius + self.delta_y - player.position_y)
             delta_x_y_minus = delta_x_y_plus - player.length * self.length
-            delta_y_x_plus = player.length * (self.position_x + self.length / 2 + self.delta_x - player.position_x)
+            delta_y_x_plus = player.length * (self.position_x + self.radius + self.delta_x - player.position_x)
             delta_y_x_minus = delta_y_x_plus - player.length * self.length
 
             self.collide_other_top(player, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus)
@@ -302,7 +307,7 @@ class Player:
         if self.alive:
             for pos_y in range(-1, 2):
                 for pos_x in range(-1, 2):
-                    player_rect = self.rect
-                    player_rect.centerx = int(self.position_x + pos_x * self.window_length)
-                    player_rect.centery = int(self.position_y + pos_y * self.window_length)
-                    screen.blit(self.image, player_rect)
+                    self_rect = self.rect
+                    self_rect.centerx = int(self.position_x + pos_x * self.window_length)
+                    self_rect.centery = int(self.position_y + pos_y * self.window_length)
+                    screen.blit(self.image, self_rect)

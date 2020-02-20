@@ -8,6 +8,7 @@ class Block:
     def __init__(self, window_length, loop, length, pos_x, pos_y):
         self.window_length = window_length
         self.length = length
+        self.radius = length / 2
         self.image = pygame.transform.smoothscale(pygame.image.load("block.png"), (int(length), int(length)))
         self.rect = self.image.get_rect()
         self.position_x = pos_x
@@ -56,3 +57,11 @@ class Block:
         psi = self.theta + 0.5 * math.pi * math.sin(self.phi)
         self.speed_x = self.speed_z * math.sin(psi)
         self.speed_y = self.speed_z * math.cos(psi)
+
+    def multi_blit(self, screen):
+        for pos_y in range(-1, 2):
+            for pos_x in range(-1, 2):
+                self_rect = self.rect
+                self_rect.centerx = int(self.position_x + pos_x * self.window_length)
+                self_rect.centery = int(self.position_y + pos_y * self.window_length)
+                screen.blit(self.image, self_rect)

@@ -23,7 +23,7 @@ while 1:
 
     player_number = 4
 
-    blocks = numpy.array(Block(window_length, loop, 2*grid_length, window_length*random.random(), window_length*random.random()))
+    blocks = numpy.array(Block(window_length, loop, 2*grid_length, grid_length, grid_length))
 
     block_number = 10
 
@@ -80,7 +80,7 @@ while 1:
 
             for block in blocks:
                 block.set_passed(passed)
-                block.randomove()
+                # block.randomove()
                 block.boundary()
 
             for player in players:
@@ -90,7 +90,7 @@ while 1:
 
         for block in blocks:
             block.positioning()
-            block.blit(screen)
+            block.multi_blit(screen)
 
         for player in players:
             player.multi_blit(screen)

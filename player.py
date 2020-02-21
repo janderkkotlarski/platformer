@@ -174,21 +174,21 @@ class Player:
             self.delta_y = 0
 
             # Collide against left of block
-            if (block.position_x - block.radius <= self.position_x + self.radius - self.window_length) and\
-                    (self.position_x >= self.window_length - self.radius):
-                self.delta_x += -self.window_length
-
             if (block.position_x + block.radius >= self.position_x - self.radius + self.window_length) and\
-                    (self.position_x <= self.radius):
+                    (self.position_x <= self.length + self.radius):
                 self.delta_x += self.window_length
 
-            if (block.position_y - block.radius <= self.position_y + self.radius - self.window_length) and \
-                    (self.position_y >= self.window_length - self.radius):
-                self.delta_y += -self.window_length
+            if (block.position_x - block.radius >= self.position_x + self.radius - self.window_length) and\
+                    (self.position_x >= self.window_length - self.length - self.radius):
+                self.delta_x -= self.window_length
 
             if (block.position_y + block.radius >= self.position_y - self.radius + self.window_length) and \
-                    (self.position_y <= self.radius):
+                    (self.position_y <= self.length + self.radius):
                 self.delta_y += self.window_length
+
+            if (block.position_y - block.radius <= self.position_y + self.radius - self.window_length) and \
+                    (self.position_y >= self.window_length - self.length - self.radius):
+                self.delta_y -= self.window_length
 
             # self.delta_x = 0
             # self.delta_y = 0

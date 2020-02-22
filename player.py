@@ -170,28 +170,31 @@ class Player:
 
     def collide(self, block):
         if self.alive:
+            delta_radius = self.radius + block.radius
+
             self.delta_x = 0
             self.delta_y = 0
 
             # Collide against left of block
-            if (block.position_x + block.radius >= self.position_x - self.radius + self.window_length) and\
-                    (self.position_x <= self.length + self.radius):
+            if (self.position_x <= delta_radius) and \
+                    (block.position_x >= self.window_length - delta_radius) and \
+                    (self.position_x - self.radius + self.window_length <= block.position_x + block.radius):
                 self.delta_x += self.window_length
 
-            if (block.position_x - block.radius >= self.position_x + self.radius - self.window_length) and\
-                    (self.position_x >= self.window_length - self.length - self.radius):
+            if (self.position_x >= self.window_length - delta_radius) and \
+                    (block.position_x <= delta_radius) and \
+                    (self.position_x + self.radius <= block.position_x + block.radius + self.window_length):
                 self.delta_x -= self.window_length
 
-            if (block.position_y + block.radius >= self.position_y - self.radius + self.window_length) and \
-                    (self.position_y <= self.length + self.radius):
+            if (self.position_y <= delta_radius) and \
+                    (block.position_y >= self.window_length - delta_radius) and \
+                    (self.position_y - self.radius + self.window_length <= block.position_y + block.radius):
                 self.delta_y += self.window_length
 
-            if (block.position_y - block.radius <= self.position_y + self.radius - self.window_length) and \
-                    (self.position_y >= self.window_length - self.length - self.radius):
+            if (self.position_y >= self.window_length - delta_radius) and \
+                    (block.position_y <= delta_radius) and \
+                    (self.position_y + self.radius <= block.position_y + block.radius + self.window_length):
                 self.delta_y -= self.window_length
-
-            # self.delta_x = 0
-            # self.delta_y = 0
 
             delta_x_y_plus = block.length*(self.position_y + self.radius + self.delta_y - block.position_y)
             delta_x_y_minus = delta_x_y_plus - block.length*self.length

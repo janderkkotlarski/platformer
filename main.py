@@ -26,19 +26,19 @@ while 1:
     blocks = numpy.array(Block(window_length, loop, 2 * grid_length, 2 * grid_length, 2.5 * grid_length))
 
     blocks = numpy.append(blocks, numpy.array(
-        Block(window_length, loop, 2 * grid_length, 4.5 * grid_length, 2 * grid_length)))
+        Block(window_length, loop, 2 * grid_length, 5.5 * grid_length, 2 * grid_length)))
     blocks = numpy.append(blocks, numpy.array(
-        Block(window_length, loop, 2 * grid_length, 7 * grid_length, 1.5 * grid_length)))
+        Block(window_length, loop, 2 * grid_length, 8 * grid_length, 1.5 * grid_length)))
     blocks = numpy.append(blocks, numpy.array(
-        Block(window_length, loop, 2 * grid_length, 9.5 * grid_length, 1 * grid_length)))
+        Block(window_length, loop, 2 * grid_length, 10.5 * grid_length, 1 * grid_length)))
     blocks = numpy.append(blocks, numpy.array(
-        Block(window_length, loop, 2 * grid_length, 12 * grid_length, 0.5 * grid_length)))
+        Block(window_length, loop, 2 * grid_length, 13 * grid_length, 0.5 * grid_length)))
     blocks = numpy.append(blocks, numpy.array(
-        Block(window_length, loop, 2 * grid_length, 14.5 * grid_length, 0.0 * grid_length)))
+        Block(window_length, loop, 2 * grid_length, 15.5 * grid_length, 0.0 * grid_length)))
     blocks = numpy.append(blocks, numpy.array(
-        Block(window_length, loop, 2 * grid_length, 17 * grid_length, -0.5 * grid_length)))
+        Block(window_length, loop, 2 * grid_length, 18 * grid_length, -0.5 * grid_length)))
     blocks = numpy.append(blocks, numpy.array(
-        Block(window_length, loop, 2 * grid_length, 19.5 * grid_length, -1.0 * grid_length)))
+        Block(window_length, loop, 2 * grid_length, 20.5 * grid_length, -1.0 * grid_length)))
 
     block_number = 10
 

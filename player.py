@@ -175,7 +175,6 @@ class Player:
             self.delta_x = 0
             self.delta_y = 0
 
-            # Collide against left of block
             if (self.position_x <= delta_radius) and \
                     (block.position_x >= self.window_length - delta_radius) and \
                     (self.position_x - self.radius + self.window_length <= block.position_x + block.radius):
@@ -206,10 +205,10 @@ class Player:
             self.collide_against_right(block, delta_x_y_plus, delta_x_y_minus, delta_y_x_minus)
             self.collide_against_left(block, delta_x_y_plus, delta_x_y_minus, delta_y_x_plus)
 
-    def collide_other_top(self, player, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus):
-        if (self.position_y + self.radius + self.delta_y >= player.position_y - player.radius - self.glue_field) and \
+    def collide_other_top(self, player):
+        if (self.position_y + self.radius + self.delta_y >= player.position_y - player.radius) and \
                 (self.position_y + self.radius + self.delta_y <= player.position_y) and\
-                (delta_x_y_plus <= delta_y_x_plus) and (delta_x_y_plus <= -delta_y_x_minus):
+                (abs(self.position_x + self.delta_x - player.position_x) <= self.radius):
             self.speed_y = 0
 
             average_y = (self.position_y + player.position_y) / 2
@@ -219,10 +218,10 @@ class Player:
 
             player.alive = False
 
-    def collide_other_bottom(self, player, delta_x_y_minus, delta_y_x_plus, delta_y_x_minus):
+    def collide_other_bottom(self, player):
         if (self.position_y - self.radius + self.delta_y <= player.position_y + player.radius + self.glue_field) and \
                 (self.position_y - self.radius + self.delta_y >= player.position_y) and \
-                (delta_x_y_minus > delta_y_x_minus) and (delta_x_y_minus > -delta_y_x_plus):
+                (abs(self.position_x + self.delta_x - player.position_x) <= self.radius):
             self.speed_y = 0
 
             average_y = (self.position_y + player.position_y) / 2
@@ -232,10 +231,10 @@ class Player:
 
             self.alive = False
 
-    def collide_other_right(self, player, delta_x_y_plus, delta_x_y_minus, delta_y_x_minus):
+    def collide_other_right(self, player):
         if (self.position_x - self.radius + self.delta_x <= player.position_x + player.radius + self.glue_field) and \
                 (self.position_x - self.radius + self.delta_x >= player.position_x) and \
-                (delta_x_y_minus <= delta_y_x_minus) and (delta_x_y_plus > -delta_y_x_minus):
+                (abs(self.position_y + self.delta_y - player.position_y) <= 2 * self.radius):
             self.speed_x = 0
             player.speed_x = 0
 
@@ -244,10 +243,10 @@ class Player:
             self.position_x = average_x + self.radius
             player.position_x = average_x - player.radius
 
-    def collide_other_left(self, player, delta_x_y_plus, delta_x_y_minus, delta_y_x_plus):
+    def collide_other_left(self, player):
         if (self.position_x + self.radius + self.delta_x >= player.position_x - player.radius + self.glue_field) and \
                 (self.position_x + self.radius + self.delta_x <= player.position_x) and \
-                (delta_x_y_plus > delta_y_x_plus) and (delta_x_y_minus <= -delta_y_x_plus):
+                (abs(self.position_y + self.delta_y - player.position_y) <= 2 * self.radius):
             self.speed_x = 0
             player.speed_x = 0
 
@@ -258,34 +257,35 @@ class Player:
 
     def collide_other(self, player):
         if self.alive and player.alive:
+            delta_radius = self.radius + player.radius
+
             self.delta_x = 0
             self.delta_y = 0
 
-            if (player.position_x - player.radius <= self.radius) and \
-                    (self.position_x >= self.window_length - self.radius):
-                self.delta_x += -self.window_length
-
-            if (player.position_x + player.radius >= self.window_length - self.radius) and \
-                    (self.position_x <= self.radius):
+            if (self.position_x <= delta_radius) and \
+                    (player.position_x >= self.window_length - delta_radius) and \
+                    (self.position_x - self.radius + self.window_length <= player.position_x + player.radius):
                 self.delta_x += self.window_length
 
-            if (player.position_y - player.radius <= self.radius) and \
-                    (self.position_y >= self.window_length - self.radius):
-                self.delta_y += -self.window_length
+            if (self.position_x >= self.window_length - delta_radius) and \
+                    (player.position_x <= delta_radius) and \
+                    (self.position_x + self.radius <= player.position_x + player.radius + self.window_length):
+                self.delta_x -= self.window_length
 
-            if (player.position_y + player.radius >= self.window_length - self.radius) and \
-                    (self.position_y <= self.radius):
+            if (self.position_y <= delta_radius) and \
+                    (player.position_y >= self.window_length - delta_radius) and \
+                    (self.position_y - self.radius + self.window_length <= player.position_y + player.radius):
                 self.delta_y += self.window_length
 
-            delta_x_y_plus = player.length * (self.position_y + self.radius + self.delta_y - player.position_y)
-            delta_x_y_minus = delta_x_y_plus - player.length * self.length
-            delta_y_x_plus = player.length * (self.position_x + self.radius + self.delta_x - player.position_x)
-            delta_y_x_minus = delta_y_x_plus - player.length * self.length
+            if (self.position_y >= self.window_length - delta_radius) and \
+                    (player.position_y <= delta_radius) and \
+                    (self.position_y + self.radius <= player.position_y + player.radius + self.window_length):
+                self.delta_y -= self.window_length
 
-            self.collide_other_top(player, delta_x_y_plus, delta_y_x_plus, delta_y_x_minus)
-            self.collide_other_bottom(player, delta_x_y_minus, delta_y_x_plus, delta_y_x_minus)
-            self.collide_other_right(player, delta_x_y_plus, delta_x_y_minus, delta_y_x_minus)
-            self.collide_other_left(player, delta_x_y_plus, delta_x_y_minus, delta_y_x_plus)
+            self.collide_other_top(player)
+            self.collide_other_bottom(player)
+            self.collide_other_right(player)
+            self.collide_other_left(player)
 
     def dragging(self):
         if self.alive:

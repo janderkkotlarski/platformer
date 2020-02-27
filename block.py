@@ -19,8 +19,8 @@ class Block:
         self.speed_z = 0.025 * self.factor
         self.theta = random.random() * 2 * math.pi
         self.phi = 0
-        self.speed_x = self.speed_z * math.sin(self.theta)
-        self.speed_y = self.speed_z * math.cos(self.theta)
+        self.speed_x = self.speed_z
+        self.speed_y = 0 * self.speed_z
 
     def positioning(self):
         self.rect.centerx = int(self.position_x)
@@ -50,13 +50,13 @@ class Block:
     def set_passed(self, passed):
         self.passed = passed
 
-    def randomove(self):
+    def move(self):
         self.position_x += self.passed * self.speed_x / self.loop
         self.position_y += self.passed * self.speed_y / self.loop
-        self.phi += 0.00005 * math.pi * 2 * random.random()
-        psi = self.theta + 0.5 * math.pi * math.sin(self.phi)
-        self.speed_x = self.speed_z * math.sin(psi)
-        self.speed_y = self.speed_z * math.cos(psi)
+
+        if abs(self.position_x % self.length - self.radius) <= self.length / (self.loop) and\
+            abs(self.position_y % self.length - self.radius) <= self.length / (self.loop):
+            self.position_x = round(self.position_x / self.length + 1) * self.length + self.radius
 
     def multi_blit(self, screen):
         for pos_y in range(-1, 2):

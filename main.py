@@ -23,17 +23,17 @@ while 1:
 
     player_number = 2
 
-    block = Block(window_length, loop, 2 * grid_length, 4 * grid_length, 0 * grid_length)
+    block = Block(window_length, loop, 2 * grid_length, 4 * grid_length, 1 * grid_length)
 
     blocks = numpy.array(block)
 
     for count in range(1, 2):
         blocks = numpy.append(blocks, numpy.array(
-            Block(window_length, loop, 2 * grid_length, block.position_x + 12 * count * grid_length, block.position_y + 0 * count * grid_length)))
+            Block(window_length, loop, 2 * grid_length, block.position_x + 12 * count * grid_length, block.position_y + 0 * grid_length)))
 
     for count in range(0, 3):
         blocks = numpy.append(blocks, numpy.array(
-            Block(window_length, loop, 2 * grid_length, block.position_x + (7 * count - 4) * grid_length, block.position_y + (0 * count - 10) * grid_length)))
+            Block(window_length, loop, 2 * grid_length, block.position_x + (7 * count - 4) * grid_length, block.position_y + - 10 * grid_length)))
 
     block_number = 10
 
@@ -54,7 +54,7 @@ while 1:
     game_loop = True
 
     while game_loop:
-        passed = clock.tick(100)
+        passed = clock.tick(loop)
 
         for player in players:
             player.set_passed(passed)
@@ -91,7 +91,7 @@ while 1:
 
             for block in blocks:
                 block.set_passed(passed)
-                # block.randomove()
+                block.move()
                 block.boundary()
 
             for player in players:

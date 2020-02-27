@@ -28,30 +28,25 @@ while 1:
     x_avoid = random.randint(0, grid_amount - 1)
     y_avoid = random.randint(0, grid_amount - 1)
 
-    block = Block(window_length, loop, grid_length, (0.5 + x_avoid) * grid_length, (0.5 + y_avoid) * grid_length)
-    block_number = 0
-
-    blocks = numpy.array(block)
+    blockz = [Block(window_length, loop, grid_length, (0.5 + x_avoid) * grid_length, (0.5 + y_avoid) * grid_length)]
 
     for y_pos in range(0, grid_amount):
         for x_pos in range(0, grid_amount):
             if (x_pos != x_avoid or y_pos != y_avoid) and\
                     (random.randint(1, 10) == 1) and\
-                    (blocks.size < 10):
-                blocks = numpy.append(blocks,
+                    (len(blockz) < 10):
+                blockz.append(
                     Block(window_length, loop, grid_length, (0.5 + x_pos) * grid_length, (0.5 + y_pos) * grid_length))
-                block_number += 1
 
-    # for count in range(1, block_number + 1):
-    #     blocks = numpy.append(blocks, numpy.array(Block(window_length, loop, 2*grid_length, window_length*random.random(), window_length*random.random())))
+    blocks = numpy.array(blockz)
 
     x_avoid = random.randint(0, grid_amount - 1)
     y_avoid = random.randint(0, grid_amount - 1)
 
     player_id = 0
 
-    players = numpy.array(Player(window_length, loop, 0.5 * grid_length, (0.5 + x_avoid) * grid_length,
-                                 (0.5 + y_avoid) * grid_length, player_id))
+    playerz = [Player(window_length, loop, 0.5 * grid_length, (0.5 + x_avoid) * grid_length,
+                                 (0.5 + y_avoid) * grid_length, player_id)]
 
     for count in range(1, player_number):
         same_x = True
@@ -62,15 +57,17 @@ while 1:
             x_avoid_new = random.randint(0, grid_amount - 1)
             y_avoid = random.randint(0, grid_amount - 1)
 
-            for player in players:
-                if round((player.position_x / grid_length) - 0.5) == x_avoid:
-                    
+            for player in playerz:
+                if round((player.position_x / grid_length) - 0.5) == x_avoid_new:
+                    same_x = True
 
         player_id += 1
 
-        players = numpy.append(players, Player(window_length, loop, 0.5 * grid_length,
-                                                           (0.5 + x_avoid_new) * grid_length, (0.5 + y_avoid) * grid_length,
-                                                           player_id))
+        playerz.append(Player(window_length, loop, 0.5 * grid_length,
+                               (0.5 + x_avoid_new) * grid_length, (0.5 + y_avoid) * grid_length,
+                               player_id))
+
+    players = numpy.array(playerz)
 
     for player in players:
         player.set_keys()

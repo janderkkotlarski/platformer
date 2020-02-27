@@ -54,9 +54,9 @@ class Block:
         self.position_x += self.passed * self.speed_x / self.loop
         self.position_y += self.passed * self.speed_y / self.loop
 
-        if abs(self.position_x % self.length - self.radius) <= self.length / (self.loop) and\
-            abs(self.position_y % self.length - self.radius) <= self.length / (self.loop):
-            self.position_x = round(self.position_x / self.length + 1) * self.length + self.radius
+        if abs(self.position_x % self.length - self.radius) <= self.radius / (self.loop) and\
+            abs(self.position_y % self.length - self.radius) <= self.radius / (self.loop):
+            self.position_y = round(self.position_y / self.length) * self.length + self.radius
 
     def multi_blit(self, screen):
         for pos_y in range(-1, 2):

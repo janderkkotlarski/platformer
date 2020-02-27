@@ -23,7 +23,7 @@ while 1:
 
     grid_length = window_length / grid_amount
 
-    player_number = 4
+    player_number = 2
 
     x_avoid = random.randint(0, grid_amount - 1)
     y_avoid = random.randint(0, grid_amount - 1)

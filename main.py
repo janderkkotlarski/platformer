@@ -19,32 +19,37 @@ while 1:
 
     loop = 100
 
-    grid_length = window_length / 20
+    grid_amount = 10
+
+    grid_length = window_length / grid_amount
 
     player_number = 2
 
-    block = Block(window_length, loop, 2 * grid_length, 3 * grid_length, 7 * grid_length)
+    x_avoid = random.randint(0, grid_amount - 1)
+    y_avoid = random.randint(0, grid_amount - 1)
+
+    block = Block(window_length, loop, grid_length, (0.5 + x_avoid) * grid_length, (0.5 + y_avoid) * grid_length)
+    block_number = 0
 
     blocks = numpy.array(block)
 
-    for count in range(1, 2):
-        blocks = numpy.append(blocks, numpy.array(
-            Block(window_length, loop, 2 * grid_length, block.position_x + (8 * count - 2) * grid_length, block.position_y + 0 * grid_length)))
-
-    for count in range(0, 3):
-        blocks = numpy.append(blocks, numpy.array(
-            Block(window_length, loop, 2 * grid_length, block.position_x + (8 * count - 6) * grid_length, block.position_y + 0 * grid_length)))
-
-    block_number = 10
+    for y_pos in range(0, grid_amount):
+        for x_pos in range(0, grid_amount):
+            if (x_pos != x_avoid or y_pos != y_avoid) and\
+                    random.randint(1, 10) == 1:
+                blocks = numpy.append(blocks, numpy.array(
+                    Block(window_length, loop, grid_length, (0.5 + x_pos) * grid_length, (0.5 + y_pos) * grid_length)))
+                block_number += 1
 
     # for count in range(1, block_number + 1):
     #     blocks = numpy.append(blocks, numpy.array(Block(window_length, loop, 2*grid_length, window_length*random.random(), window_length*random.random())))
 
-    players = numpy.array(Player(window_length, loop, grid_length, 0.75*window_length, 0.75*window_length, 0))
+    players = numpy.array(Player(window_length, loop, 0.5*grid_length, 0.75*window_length, 0.75*window_length, 0))
 
     for count in range(1, player_number):
-        players = numpy.append(players, numpy.array(Player(window_length, loop, grid_length,
-                                                           0*window_length*random.random() + 0.25*window_length, 0*window_length*random.random() + 0.75*window_length, count)))
+        players = numpy.append(players, numpy.array(Player(window_length, loop, 0.5*grid_length,
+                                                           0*window_length*random.random() + 0.25*window_length,
+                                                           0*window_length*random.random() + 0.75*window_length, count)))
 
     for player in players:
         player.set_keys()

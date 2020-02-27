@@ -23,17 +23,17 @@ while 1:
 
     player_number = 2
 
-    block = Block(window_length, loop, 2 * grid_length, 3.5 * grid_length, 5 * grid_length)
+    block = Block(window_length, loop, 2 * grid_length, 3 * grid_length, 7 * grid_length)
 
     blocks = numpy.array(block)
 
     for count in range(1, 2):
         blocks = numpy.append(blocks, numpy.array(
-            Block(window_length, loop, 2 * grid_length, block.position_x + (7 * count - 4) * grid_length, block.position_y + 2 * grid_length)))
+            Block(window_length, loop, 2 * grid_length, block.position_x + (8 * count - 2) * grid_length, block.position_y + 0 * grid_length)))
 
     for count in range(0, 3):
         blocks = numpy.append(blocks, numpy.array(
-            Block(window_length, loop, 2 * grid_length, block.position_x + (7 * count - 4) * grid_length, block.position_y + 2 * grid_length)))
+            Block(window_length, loop, 2 * grid_length, block.position_x + (8 * count - 6) * grid_length, block.position_y + 0 * grid_length)))
 
     block_number = 10
 
@@ -91,6 +91,7 @@ while 1:
 
             for block in blocks:
                 block.set_passed(passed)
+                block.randirection()
                 block.move()
                 block.boundary()
 

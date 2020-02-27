@@ -23,7 +23,7 @@ while 1:
 
     grid_length = window_length / grid_amount
 
-    player_number = 2
+    player_number = 4
 
     x_avoid = random.randint(0, grid_amount - 1)
     y_avoid = random.randint(0, grid_amount - 1)
@@ -36,20 +36,41 @@ while 1:
     for y_pos in range(0, grid_amount):
         for x_pos in range(0, grid_amount):
             if (x_pos != x_avoid or y_pos != y_avoid) and\
-                    random.randint(1, 10) == 1:
-                blocks = numpy.append(blocks, numpy.array(
-                    Block(window_length, loop, grid_length, (0.5 + x_pos) * grid_length, (0.5 + y_pos) * grid_length)))
+                    (random.randint(1, 10) == 1) and\
+                    (blocks.size < 10):
+                blocks = numpy.append(blocks,
+                    Block(window_length, loop, grid_length, (0.5 + x_pos) * grid_length, (0.5 + y_pos) * grid_length))
                 block_number += 1
 
     # for count in range(1, block_number + 1):
     #     blocks = numpy.append(blocks, numpy.array(Block(window_length, loop, 2*grid_length, window_length*random.random(), window_length*random.random())))
 
-    players = numpy.array(Player(window_length, loop, 0.5*grid_length, 0.75*window_length, 0.75*window_length, 0))
+    x_avoid = random.randint(0, grid_amount - 1)
+    y_avoid = random.randint(0, grid_amount - 1)
+
+    player_id = 0
+
+    players = numpy.array(Player(window_length, loop, 0.5 * grid_length, (0.5 + x_avoid) * grid_length,
+                                 (0.5 + y_avoid) * grid_length, player_id))
 
     for count in range(1, player_number):
-        players = numpy.append(players, numpy.array(Player(window_length, loop, 0.5*grid_length,
-                                                           0*window_length*random.random() + 0.25*window_length,
-                                                           0*window_length*random.random() + 0.75*window_length, count)))
+        same_x = True
+
+        while same_x:
+            same_x = False
+
+            x_avoid_new = random.randint(0, grid_amount - 1)
+            y_avoid = random.randint(0, grid_amount - 1)
+
+            for player in players:
+                if round((player.position_x / grid_length) - 0.5) == x_avoid:
+                    
+
+        player_id += 1
+
+        players = numpy.append(players, Player(window_length, loop, 0.5 * grid_length,
+                                                           (0.5 + x_avoid_new) * grid_length, (0.5 + y_avoid) * grid_length,
+                                                           player_id))
 
     for player in players:
         player.set_keys()

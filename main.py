@@ -21,6 +21,8 @@ while 1:
 
     grid_amount = 10
 
+    block_amount = 10
+
     grid_length = window_length / grid_amount
 
     player_number = 2
@@ -34,7 +36,7 @@ while 1:
         for x_pos in range(0, grid_amount):
             if (x_pos != x_avoid or y_pos != y_avoid) and\
                     (random.randint(1, 10) == 1) and\
-                    (len(blockz) < 10):
+                    (len(blockz) < block_amount):
                 blockz.append(
                     Block(window_length, loop, grid_length, (0.5 + x_pos) * grid_length, (0.5 + y_pos) * grid_length))
 
